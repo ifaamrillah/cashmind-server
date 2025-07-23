@@ -7,6 +7,7 @@ import { HTTPSTATUS } from "./config/http.config";
 
 import { errorHandler } from "./middlewares/error-handler.middleware";
 import { asyncHandler } from "./middlewares/async-handler.middleware";
+import { connectMongoDB } from "./config/db.config";
 
 const app = express();
 const BASE_PATH = ENV.BASE_PATH;
@@ -32,6 +33,7 @@ app.get(
 
 app.use(errorHandler);
 
-app.listen(ENV.PORT, () => {
+app.listen(ENV.PORT, async () => {
+  await connectMongoDB();
   console.log(`Server is running on port ${ENV.PORT} in ${ENV.NODE_ENV} mode`);
 });
