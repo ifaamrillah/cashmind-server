@@ -4,6 +4,12 @@ import cors from "cors";
 
 import { ENV } from "./configs/env.config";
 import { HTTP_STATUS } from "./configs/http.config";
+import { connectDatabase } from "./configs/database.config";
+
+import { errorHandler } from "./middlewares/error-handler.middleware";
+
+import { BadRequestException } from "./utils/app-error";
+import { asyncHandler } from "./middlewares/async-handler.middleware";
 
 const BASE_PATH = ENV.BASE_PATH;
 
@@ -19,13 +25,21 @@ app.use(
   })
 );
 
-app.get("/", (req: Request, res: Response, next: NextFunction) => [
-  res.status(HTTP_STATUS.OK).json({
-    message: "CashMind Server API is running.",
-  }),
-]);
+app.get(
+  "/",
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    throw new BadRequestException("This s a test error");
+    res.status(HTTP_STATUS.OK).json({
+      message: "CashMind Server API is running.",
+    });
+  })
+);
 
-app.listen(ENV.PORT, () => {
+app.use(errorHandler);
+
+app.listen(ENV.PORT, async () => {
+  await connectDatabase();
+
   console.log(
     `Server is running on port "${ENV.PORT}" in "${ENV.NODE_ENV}" mode.`
   );
