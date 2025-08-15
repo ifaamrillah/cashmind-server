@@ -15,26 +15,31 @@ export interface ReportDocument extends Document {
   updatedAt: Date;
 }
 
-const reportSchema = new mongoose.Schema<ReportDocument>({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "User",
+const reportSchema = new mongoose.Schema<ReportDocument>(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    period: {
+      type: String,
+      required: true,
+    },
+    sentDate: {
+      type: Date,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: Object.values(ReportStatusEnum),
+      default: ReportStatusEnum.PENDING,
+    },
   },
-  period: {
-    type: String,
-    required: true,
-  },
-  sentDate: {
-    type: Date,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: Object.values(ReportStatusEnum),
-    default: ReportStatusEnum.PENDING,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 const ReportModel = mongoose.model<ReportDocument>("Report", reportSchema);
 
