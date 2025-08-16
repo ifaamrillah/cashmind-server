@@ -7,9 +7,11 @@ import { HTTP_STATUS } from "./configs/http.config";
 import { connectDatabase } from "./configs/database.config";
 
 import { errorHandler } from "./middlewares/error-handler.middleware";
+import { asyncHandler } from "./middlewares/async-handler.middleware";
 
 import { BadRequestException } from "./utils/app-error";
-import { asyncHandler } from "./middlewares/async-handler.middleware";
+
+import authRoutes from "./routes/auth.route";
 
 const BASE_PATH = ENV.BASE_PATH;
 
@@ -34,6 +36,8 @@ app.get(
     });
   })
 );
+
+app.use(`${BASE_PATH}/auth`, authRoutes);
 
 app.use(errorHandler);
 
