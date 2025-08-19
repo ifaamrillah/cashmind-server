@@ -42,9 +42,7 @@ export const registerService = async (body: RegisterSchemaType) => {
 
       await reportSetting.save({ session });
 
-      return {
-        user: newUser.omitPassword(),
-      };
+      return newUser.omitPassword();
     });
 
     return result;
