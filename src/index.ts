@@ -16,6 +16,7 @@ import { BadRequestException } from "./utils/app-error";
 
 import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.route";
+import transactionRoutes from "./routes/transaction.route";
 
 const BASE_PATH = ENV.BASE_PATH;
 
@@ -44,6 +45,7 @@ app.get(
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/user`, passportAuthenticateJwt, userRoutes);
+app.use(`${BASE_PATH}/transaction`, passportAuthenticateJwt, transactionRoutes);
 
 app.use(errorHandler);
 
