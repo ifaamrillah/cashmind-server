@@ -2,9 +2,14 @@ import { Request, Response } from "express";
 
 import { HTTP_STATUS } from "../configs/http.config";
 
+import { TransactionTypeEnum } from "../models/transaction.model";
+
 import { asyncHandler } from "../middlewares/async-handler.middleware";
 
-import { createTransactionService } from "../services/transaction.service";
+import {
+  createTransactionService,
+  getAllTransactionService,
+} from "../services/transaction.service";
 
 import { createTransactionSchema } from "../validators/transaction.validator";
 
@@ -19,6 +24,34 @@ export const createTransactionController = asyncHandler(
 
     return res.status(HTTP_STATUS.CREATED).json({
       message: "Transaction created successfully",
+      data: result,
+    });
+  }
+);
+
+export const getAllTransactionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+
+    const filters = {
+      keyword: req.query.keyword as string | undefined,
+      type: req.query.type as keyof typeof TransactionTypeEnum | undefined,
+      recurringStatus: req.query.recurringStatus as
+        | "RECURRING"
+        | "NON_RECURRING"
+        | undefined,
+    };
+
+    // pagination
+    const pagination = {
+      pageSize: parseInt(req.query.pageSize as string) || 20,
+      pageNumber: parseInt(req.query.pageNumber as string) || 1,
+    };
+
+    const result = await getAllTransactionService(userId, filters, pagination);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Transactions fetched successfully",
       data: result,
     });
   }
