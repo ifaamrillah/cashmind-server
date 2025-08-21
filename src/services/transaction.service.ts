@@ -2,12 +2,13 @@ import TransactionModel, {
   TransactionTypeEnum,
 } from "../models/transaction.model";
 
-import { CreateTransactionSchema } from "../validators/transaction.validator";
+import { CreateTransactionSchemaType } from "../validators/transaction.validator";
 
 import { calculateNextOccurrence } from "../utils/helper";
+import { NotFoundException } from "../utils/app-error";
 
 export const createTransactionService = async (
-  body: CreateTransactionSchema,
+  body: CreateTransactionSchemaType,
   userId: string
 ) => {
   const { date, isRecurring, recurringInterval, category, amount } = body;
@@ -107,4 +108,20 @@ export const getAllTransactionService = async (
       skip,
     },
   };
+};
+
+export const getTransactionByIdService = async (
+  userId: string,
+  transactionId: string
+) => {
+  const transaction = await TransactionModel.findOne({
+    _id: transactionId,
+    userId,
+  });
+
+  if (!transaction) {
+    throw new NotFoundException("Transaction not found");
+  }
+
+  return transaction;
 };
