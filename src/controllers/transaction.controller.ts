@@ -9,9 +9,13 @@ import { asyncHandler } from "../middlewares/async-handler.middleware";
 import {
   createTransactionService,
   getAllTransactionService,
+  getTransactionByIdService,
 } from "../services/transaction.service";
 
-import { createTransactionSchema } from "../validators/transaction.validator";
+import {
+  createTransactionSchema,
+  transactionIdSchema,
+} from "../validators/transaction.validator";
 
 export const createTransactionController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -52,6 +56,20 @@ export const getAllTransactionController = asyncHandler(
 
     return res.status(HTTP_STATUS.OK).json({
       message: "Transactions fetched successfully",
+      data: result,
+    });
+  }
+);
+
+export const getTransactionByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const transactionId = transactionIdSchema.parse(req.params.id);
+
+    const result = await getTransactionByIdService(userId, transactionId);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Transaction fetched successfully",
       data: result,
     });
   }
