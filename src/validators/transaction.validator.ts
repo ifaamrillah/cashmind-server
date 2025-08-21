@@ -6,6 +6,8 @@ import {
   TransactionTypeEnum,
 } from "../models/transaction.model";
 
+export const transactionIdSchema = z.string().trim().min(1);
+
 export const baseTransactionSchema = z.object({
   title: z.string().min(1, "Title is required"),
   type: z.enum([TransactionTypeEnum.INCOME, TransactionTypeEnum.EXPENSE], {
@@ -44,5 +46,9 @@ export const baseTransactionSchema = z.object({
 export const createTransactionSchema = baseTransactionSchema;
 export const updateTransactionSchema = baseTransactionSchema.partial();
 
-export type CreateTransactionSchema = z.infer<typeof createTransactionSchema>;
-export type UpdateTransactionSchema = z.infer<typeof updateTransactionSchema>;
+export type CreateTransactionSchemaType = z.infer<
+  typeof createTransactionSchema
+>;
+export type UpdateTransactionSchemaType = z.infer<
+  typeof updateTransactionSchema
+>;
