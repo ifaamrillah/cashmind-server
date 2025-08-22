@@ -17,6 +17,7 @@ export const baseTransactionSchema = z.object({
   }),
   amount: z.number().positive("Amount must be greater than 0").min(1),
   category: z.string().min(1, "Category is required"),
+  description: z.string().optional(),
   date: z
     .union([z.string().datetime({ message: "Invalid date format" }), z.date()])
     .transform((value) => new Date(value)),
