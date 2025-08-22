@@ -8,6 +8,7 @@ import { asyncHandler } from "../middlewares/async-handler.middleware";
 
 import {
   createTransactionService,
+  duplicateTransactionByIdService,
   getAllTransactionService,
   getTransactionByIdService,
 } from "../services/transaction.service";
@@ -70,6 +71,20 @@ export const getTransactionByIdController = asyncHandler(
 
     return res.status(HTTP_STATUS.OK).json({
       message: "Transaction fetched successfully",
+      data: result,
+    });
+  }
+);
+
+export const duplicateTransactionByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const transactionId = transactionIdSchema.parse(req.params.id);
+
+    const result = await duplicateTransactionByIdService(userId, transactionId);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Transaction duplicated successfully",
       data: result,
     });
   }
