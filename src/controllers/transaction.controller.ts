@@ -11,11 +11,13 @@ import {
   duplicateTransactionByIdService,
   getAllTransactionService,
   getTransactionByIdService,
+  updateTransactionByIdService,
 } from "../services/transaction.service";
 
 import {
   createTransactionSchema,
   transactionIdSchema,
+  updateTransactionSchema,
 } from "../validators/transaction.validator";
 
 export const createTransactionController = asyncHandler(
@@ -82,6 +84,25 @@ export const duplicateTransactionByIdController = asyncHandler(
     const transactionId = transactionIdSchema.parse(req.params.id);
 
     const result = await duplicateTransactionByIdService(userId, transactionId);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Transaction duplicated successfully",
+      data: result,
+    });
+  }
+);
+
+export const updateTransactionByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const transactionId = transactionIdSchema.parse(req.params.id);
+    const body = updateTransactionSchema.parse(req.body);
+
+    const result = await updateTransactionByIdService(
+      userId,
+      transactionId,
+      body
+    );
 
     return res.status(HTTP_STATUS.OK).json({
       message: "Transaction duplicated successfully",
