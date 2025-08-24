@@ -8,6 +8,7 @@ import { asyncHandler } from "../middlewares/async-handler.middleware";
 
 import {
   createTransactionService,
+  deleteTransactionByIdService,
   duplicateTransactionByIdService,
   getAllTransactionService,
   getTransactionByIdService,
@@ -107,6 +108,19 @@ export const updateTransactionByIdController = asyncHandler(
     return res.status(HTTP_STATUS.OK).json({
       message: "Transaction duplicated successfully",
       data: result,
+    });
+  }
+);
+
+export const deleteTransactionByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const transactionId = transactionIdSchema.parse(req.params.id);
+
+    await deleteTransactionByIdService(userId, transactionId);
+
+    return res.status(HTTP_STATUS.NO_CONTENT).json({
+      message: "Transaction deleted successfully",
     });
   }
 );
