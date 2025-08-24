@@ -4,14 +4,14 @@ import {
   createTransactionController,
   deleteTransactionByIdController,
   duplicateTransactionByIdController,
-  getAllTransactionController,
+  getTransactionsController,
   getTransactionByIdController,
   updateTransactionByIdController,
 } from "../controllers/transaction.controller";
 
 const transactionRoutes = Router();
 
-transactionRoutes.get("/", getAllTransactionController);
+transactionRoutes.get("/", getTransactionsController);
 transactionRoutes.get("/:id", getTransactionByIdController);
 
 transactionRoutes.post("/", createTransactionController);

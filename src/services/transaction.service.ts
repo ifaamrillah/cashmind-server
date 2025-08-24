@@ -43,7 +43,7 @@ export const createTransactionService = async (
   return transaction;
 };
 
-export const getAllTransactionService = async (
+export const getTransactionsService = async (
   userId: string,
   filters: {
     keyword?: string;

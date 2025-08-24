@@ -10,7 +10,7 @@ import {
   createTransactionService,
   deleteTransactionByIdService,
   duplicateTransactionByIdService,
-  getAllTransactionService,
+  getTransactionsService,
   getTransactionByIdService,
   updateTransactionByIdService,
 } from "../services/transaction.service";
@@ -37,7 +37,7 @@ export const createTransactionController = asyncHandler(
   }
 );
 
-export const getAllTransactionController = asyncHandler(
+export const getTransactionsController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?._id;
 
@@ -56,7 +56,7 @@ export const getAllTransactionController = asyncHandler(
       pageNumber: parseInt(req.query.pageNumber as string) || 1,
     };
 
-    const result = await getAllTransactionService(userId, filters, pagination);
+    const result = await getTransactionsService(userId, filters, pagination);
 
     return res.status(HTTP_STATUS.OK).json({
       message: "Transactions fetched successfully",
