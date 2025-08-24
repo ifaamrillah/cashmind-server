@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
   createTransactionController,
+  deleteTransactionByIdController,
   duplicateTransactionByIdController,
   getAllTransactionController,
   getTransactionByIdController,
@@ -17,5 +18,7 @@ transactionRoutes.post("/", createTransactionController);
 transactionRoutes.post("/duplicate/:id", duplicateTransactionByIdController);
 
 transactionRoutes.patch("/:id", updateTransactionByIdController);
+
+transactionRoutes.delete("/:id", deleteTransactionByIdController);
 
 export default transactionRoutes;
