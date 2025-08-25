@@ -13,10 +13,12 @@ import {
   getTransactionsService,
   getTransactionByIdService,
   updateTransactionByIdService,
+  deleteTransactionsByIdsService,
 } from "../services/transaction.service";
 
 import {
   createTransactionSchema,
+  deleteTransactionsByIdsSchema,
   transactionIdSchema,
   updateTransactionSchema,
 } from "../validators/transaction.validator";
@@ -119,8 +121,26 @@ export const deleteTransactionByIdController = asyncHandler(
 
     await deleteTransactionByIdService(userId, transactionId);
 
-    return res.status(HTTP_STATUS.NO_CONTENT).json({
+    return res.status(HTTP_STATUS.OK).json({
       message: "Transaction deleted successfully",
+    });
+  }
+);
+
+export const deleteTransactionsByIdsController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+
+    const { transactionsIds } = deleteTransactionsByIdsSchema.parse(req.body);
+
+    const result = await deleteTransactionsByIdsService(
+      userId,
+      transactionsIds
+    );
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Transaction deleted successfully",
+      ...result,
     });
   }
 );
