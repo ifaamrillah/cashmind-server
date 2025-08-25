@@ -47,9 +47,18 @@ export const baseTransactionSchema = z.object({
 export const createTransactionSchema = baseTransactionSchema;
 export const updateTransactionSchema = baseTransactionSchema.partial();
 
+export const deleteTransactionsByIdsSchema = z.object({
+  transactionsIds: z
+    .array(z.string().length(24, "Invalid transaction id"))
+    .min(1, "at least one transaction id is required"),
+});
+
 export type CreateTransactionSchemaType = z.infer<
   typeof createTransactionSchema
 >;
 export type UpdateTransactionSchemaType = z.infer<
   typeof updateTransactionSchema
+>;
+export type DeleteTransactionsByIdsSchemaType = z.infer<
+  typeof deleteTransactionsByIdsSchema
 >;
