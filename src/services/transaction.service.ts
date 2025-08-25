@@ -235,3 +235,31 @@ export const deleteTransactionByIdService = async (
 
   return;
 };
+
+export const deleteTransactionsByIdsService = async (
+  userId: string,
+  transactionsIds: string[]
+) => {
+  const foundTransactions = await TransactionModel.find({
+    _id: { $in: transactionsIds },
+    userId,
+  }).select("_id");
+
+  const foundIds = foundTransactions.map((t) => t._id.toString());
+  const notFoundIds = transactionsIds.filter((id) => !foundIds.includes(id));
+
+  if (notFoundIds.length > 0) {
+    throw new NotFoundException(
+      `Some transactions not found: ${notFoundIds.join(", ")}`
+    );
+  }
+
+  const deleted = await TransactionModel.deleteMany({
+    _id: { $in: transactionsIds },
+    userId,
+  });
+
+  return {
+    deletedCount: deleted.deletedCount,
+  };
+};
