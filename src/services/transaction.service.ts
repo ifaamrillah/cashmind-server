@@ -10,39 +10,6 @@ import {
 import { calculateNextOccurrence } from "../utils/helper";
 import { NotFoundException } from "../utils/app-error";
 
-export const createTransactionService = async (
-  body: CreateTransactionSchemaType,
-  userId: string
-) => {
-  const { date, isRecurring, recurringInterval, category, amount } = body;
-
-  let nextRecurringDate: Date | undefined;
-
-  const currentDate = new Date();
-
-  if (isRecurring && recurringInterval) {
-    const calculatedDate = calculateNextOccurrence(date, recurringInterval);
-
-    nextRecurringDate =
-      calculatedDate < currentDate
-        ? calculateNextOccurrence(currentDate, recurringInterval)
-        : calculatedDate;
-  }
-
-  const transaction = await TransactionModel.create({
-    ...body,
-    userId,
-    category: category || "Other",
-    amount: Number(amount),
-    isRecurring: isRecurring || false,
-    recurringInterval: recurringInterval || null,
-    nextRecurringDate,
-    lastProcessed: null,
-  });
-
-  return transaction;
-};
-
 export const getTransactionsService = async (
   userId: string,
   filters: {
@@ -127,6 +94,71 @@ export const getTransactionByIdService = async (
   }
 
   return transaction;
+};
+
+export const createTransactionService = async (
+  body: CreateTransactionSchemaType,
+  userId: string
+) => {
+  const { date, isRecurring, recurringInterval, category, amount } = body;
+
+  let nextRecurringDate: Date | undefined;
+
+  const currentDate = new Date();
+
+  if (isRecurring && recurringInterval) {
+    const calculatedDate = calculateNextOccurrence(date, recurringInterval);
+
+    nextRecurringDate =
+      calculatedDate < currentDate
+        ? calculateNextOccurrence(currentDate, recurringInterval)
+        : calculatedDate;
+  }
+
+  const transaction = await TransactionModel.create({
+    ...body,
+    userId,
+    category: category || "Other",
+    amount: Number(amount),
+    isRecurring: isRecurring || false,
+    recurringInterval: recurringInterval || null,
+    nextRecurringDate,
+    lastProcessed: null,
+  });
+
+  return transaction;
+};
+
+export const createTransactionsService = async (
+  userId: string,
+  transactions: CreateTransactionSchemaType[]
+) => {
+  try {
+    const bulkOps = transactions.map((trx) => ({
+      insertOne: {
+        document: {
+          ...trx,
+          userId,
+          isRecurring: false,
+          nextRecurringDate: null,
+          recurringInterval: null,
+          lastProcessed: null,
+          createdAt: new Date(),
+          updateAt: new Date(),
+        },
+      },
+    }));
+
+    const result = await TransactionModel.bulkWrite(bulkOps, {
+      ordered: true,
+    });
+
+    return {
+      insertedCount: result.insertedCount,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const duplicateTransactionByIdService = async (
