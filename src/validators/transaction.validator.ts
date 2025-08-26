@@ -45,20 +45,37 @@ export const baseTransactionSchema = z.object({
 });
 
 export const createTransactionSchema = baseTransactionSchema;
+
+export const createTransactionsSchema = z.object({
+  transactions: z
+    .array(baseTransactionSchema)
+    .min(1, "At least one transaction is required")
+    .max(300, "Maximum of 300 transactions are allowed")
+    .refine(
+      (trxs) =>
+        trxs.every((trx) => {
+          const amount = Number(trx.amount);
+          return !isNaN(amount) && amount > 0 && amount <= 1_000_000_000;
+        }),
+      {
+        message:
+          "Amount must be greater than 0 and less than or equal to 1,000,000,000",
+      }
+    ),
+});
+
 export const updateTransactionSchema = baseTransactionSchema.partial();
 
 export const deleteTransactionsByIdsSchema = z.object({
   transactionsIds: z
     .array(z.string().length(24, "Invalid transaction id"))
-    .min(1, "at least one transaction id is required"),
+    .min(1, "At least one transaction id is required"),
 });
 
 export type CreateTransactionSchemaType = z.infer<
   typeof createTransactionSchema
 >;
+
 export type UpdateTransactionSchemaType = z.infer<
   typeof updateTransactionSchema
->;
-export type DeleteTransactionsByIdsSchemaType = z.infer<
-  typeof deleteTransactionsByIdsSchema
 >;
