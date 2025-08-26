@@ -14,30 +14,16 @@ import {
   getTransactionByIdService,
   updateTransactionByIdService,
   deleteTransactionsByIdsService,
+  createTransactionsService,
 } from "../services/transaction.service";
 
 import {
   createTransactionSchema,
+  createTransactionsSchema,
   deleteTransactionsByIdsSchema,
   transactionIdSchema,
   updateTransactionSchema,
 } from "../validators/transaction.validator";
-
-export const createTransactionController = asyncHandler(
-  async (req: Request, res: Response) => {
-    const body = createTransactionSchema.parse(req.body);
-    const userId = req.user?._id;
-
-    console.log("User", userId);
-
-    const result = await createTransactionService(body, userId);
-
-    return res.status(HTTP_STATUS.CREATED).json({
-      message: "Transaction created successfully",
-      data: result,
-    });
-  }
-);
 
 export const getTransactionsController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -77,6 +63,35 @@ export const getTransactionByIdController = asyncHandler(
     return res.status(HTTP_STATUS.OK).json({
       message: "Transaction fetched successfully",
       data: result,
+    });
+  }
+);
+
+export const createTransactionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const body = createTransactionSchema.parse(req.body);
+    const userId = req.user?._id;
+
+    const result = await createTransactionService(body, userId);
+
+    return res.status(HTTP_STATUS.CREATED).json({
+      message: "Transaction created successfully",
+      data: result,
+    });
+  }
+);
+
+export const createTransactionsController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+
+    const { transactions } = createTransactionsSchema.parse(req.body);
+
+    const result = await createTransactionsService(userId, transactions);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Transactions created successfully",
+      ...result,
     });
   }
 );
