@@ -8,6 +8,7 @@ import {
   getTransactionByIdController,
   updateTransactionByIdController,
   deleteTransactionsByIdsController,
+  createTransactionsController,
 } from "../controllers/transaction.controller";
 
 const transactionRoutes = Router();
@@ -16,6 +17,7 @@ transactionRoutes.get("/", getTransactionsController);
 transactionRoutes.get("/:id", getTransactionByIdController);
 
 transactionRoutes.post("/", createTransactionController);
+transactionRoutes.post("/bulk", createTransactionsController);
 transactionRoutes.post("/duplicate/:id", duplicateTransactionByIdController);
 
 transactionRoutes.patch("/:id", updateTransactionByIdController);
