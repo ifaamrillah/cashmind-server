@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import { upload } from "../configs/cloudinary.config";
+
 import {
   createTransactionController,
   deleteTransactionByIdController,
@@ -9,6 +11,7 @@ import {
   updateTransactionByIdController,
   deleteTransactionsByIdsController,
   createTransactionsController,
+  scanReceiptController,
 } from "../controllers/transaction.controller";
 
 const transactionRoutes = Router();
@@ -19,6 +22,11 @@ transactionRoutes.get("/:id", getTransactionByIdController);
 transactionRoutes.post("/", createTransactionController);
 transactionRoutes.post("/bulk", createTransactionsController);
 transactionRoutes.post("/duplicate/:id", duplicateTransactionByIdController);
+transactionRoutes.post(
+  "/scan-receipt",
+  upload.single("receipt"),
+  scanReceiptController
+);
 
 transactionRoutes.patch("/:id", updateTransactionByIdController);
 
