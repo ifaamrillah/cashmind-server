@@ -15,6 +15,7 @@ import {
   updateTransactionByIdService,
   deleteTransactionsByIdsService,
   createTransactionsService,
+  scanReceiptService,
 } from "../services/transaction.service";
 
 import {
@@ -155,6 +156,19 @@ export const deleteTransactionsByIdsController = asyncHandler(
 
     return res.status(HTTP_STATUS.OK).json({
       message: "Transaction deleted successfully",
+      ...result,
+    });
+  }
+);
+
+export const scanReceiptController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const file = req?.file;
+
+    const result = await scanReceiptService(file);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Receipt scanned successfully",
       ...result,
     });
   }
