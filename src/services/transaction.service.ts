@@ -1,3 +1,8 @@
+import axios from "axios";
+import { createPartFromBase64, createUserContent } from "@google/genai";
+
+import { genAIModel, getAI } from "../configs/google-ai.config";
+
 import TransactionModel, {
   TransactionTypeEnum,
 } from "../models/transaction.model";
@@ -8,7 +13,8 @@ import {
 } from "../validators/transaction.validator";
 
 import { calculateNextOccurrence } from "../utils/helper";
-import { NotFoundException } from "../utils/app-error";
+import { BadRequestException, NotFoundException } from "../utils/app-error";
+import { receiptPrompt } from "../utils/prompt";
 
 export const getTransactionsService = async (
   userId: string,
@@ -294,4 +300,74 @@ export const deleteTransactionsByIdsService = async (
   return {
     deletedCount: deleted.deletedCount,
   };
+};
+
+export const scanReceiptService = async (
+  file: Express.Multer.File | undefined
+) => {
+  if (!file) {
+    throw new BadRequestException("File not found");
+  }
+
+  try {
+    if (!file.path) {
+      throw new BadRequestException("Failed to upload file");
+    }
+
+    const responseData = await axios.get(file.path, {
+      responseType: "arraybuffer",
+    });
+
+    const base64String = Buffer.from(responseData.data).toString("base64");
+
+    if (!base64String) {
+      throw new BadRequestException("Could not process file");
+    }
+
+    const result = await getAI.models.generateContent({
+      model: genAIModel,
+      contents: [
+        createUserContent([
+          receiptPrompt,
+          createPartFromBase64(base64String, file.mimetype),
+        ]),
+      ],
+      config: {
+        temperature: 0,
+        topP: 1,
+        responseMimeType: "application/json",
+      },
+    });
+
+    const response = result.text;
+    const cleanedText = response?.replace(/```(?:json)?\n?/g, "").trim();
+
+    if (!cleanedText) {
+      return {
+        error: "Could not read receipt content",
+      };
+    }
+
+    const data = JSON.parse(cleanedText);
+
+    if (!data?.amount || !data?.date) {
+      return {
+        error: "Receipt missing required fields",
+      };
+    }
+
+    return {
+      title: data.title || "Receipt",
+      amount: data.amount,
+      date: new Date(data.date),
+      description: data.description,
+      category: data.category,
+      paymentMethod: data.paymentMethod,
+      receiptUrl: file.path,
+    };
+  } catch (error) {
+    return {
+      error: "Receipt scanning service unavailable",
+    };
+  }
 };
