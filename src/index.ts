@@ -4,6 +4,8 @@ import cors from "cors";
 import passport from "passport";
 import "./configs/passport.config";
 
+import { initializeCrons } from "./crons";
+
 import { ENV } from "./configs/env.config";
 import { HTTP_STATUS } from "./configs/http.config";
 import { connectDatabase } from "./configs/database.config";
@@ -51,6 +53,10 @@ app.use(errorHandler);
 
 app.listen(ENV.PORT, async () => {
   await connectDatabase();
+
+  if (ENV.NODE_ENV === "development") {
+    await initializeCrons();
+  }
 
   console.log(
     `Server is running on port "${ENV.PORT}" in "${ENV.NODE_ENV}" mode.`
